@@ -3,32 +3,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { format, getDay, parseISO, startOfDay, isBefore, isEqual } from 'date-fns';
 import { mockClasses, initialAttendance, getRescheduleOptions, mockStudents } from '../lib/mockData';
-import { ClassInfo, AttendanceRecord, Student, AttendanceStatus, DayOfWeek } from '../lib/types';
-import { ChevronDown, Check, X, Calendar as CalendarIcon } from 'lucide-react';
+import { ClassInfo, AttendanceRecord, Student, AttendanceStatus, DayOfWeek, DisplayStudent, ReschedulingInfo, EffectiveClassInstance } from '../lib/types';
 import AttendanceCalendar from './components/AttendanceCalendar';
-import ClassCard from './components/ClassCard';
-
-// Helper function to format time
-const formatTime = (hour: number, minute: number): string => {
-  const date = new Date();
-  date.setHours(hour, minute);
-  return format(date, 'h:mm a'); // e.g., 9:00 AM
-};
-
-interface ReschedulingInfo {
-  studentId: string;
-  studentName: string;
-  originalClassId: string;
-}
-
-// Interface for students appearing in a class instance, noting if it's a makeup
-interface DisplayStudent extends Student {
-  isMakeup: boolean;
-}
-
-interface EffectiveClassInstance extends ClassInfo {
-    displayStudents: DisplayStudent[];
-}
+import ClassList from './components/ClassList';
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
@@ -300,42 +277,30 @@ export default function AttendancePage() {
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Attendance Tracker</h1>
 
-      {/* Use the new AttendanceCalendar component */}
+      {/* Use the AttendanceCalendar component */}
       <AttendanceCalendar 
          selectedDate={selectedDate}
          onDateChange={handleDateChange} 
       />
 
-      {/* Classes Section - Use ClassCard component */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Classes for {format(selectedDate, 'EEEE, MMMM do')}</h2>
-        {effectiveClassesForSelectedDate.length === 0 ? (
-          <p className="text-gray-500 italic">No classes scheduled for this day.</p>
-        ) : (
-          <div className="space-y-6">
-            {effectiveClassesForSelectedDate.map((classInstance) => (
-              <ClassCard
-                key={classInstance.id}
-                classInstance={classInstance}
-                formattedSelectedDate={formattedSelectedDate}
-                reschedulingInfo={reschedulingInfo}
-                rescheduleTargetClassId={rescheduleTargetClassId}
-                rescheduleTargetDate={rescheduleTargetDate}
-                selectedRescheduleClassInfo={selectedRescheduleClassInfo ?? null}
-                getStudentAttendanceDetails={getStudentAttendanceDetails}
-                handleAttendanceChange={handleAttendanceChange}
-                handleRescheduleClick={handleRescheduleClick}
-                confirmReschedule={confirmReschedule}
-                setReschedulingInfo={setReschedulingInfo}
-                setRescheduleTargetClassId={setRescheduleTargetClassId}
-                setRescheduleTargetDate={setRescheduleTargetDate}
-                disableRescheduleDates={disableRescheduleDates}
-                handleRescheduleDateChange={handleRescheduleDateChange}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Use the ClassList component */}
+      <ClassList
+        classes={effectiveClassesForSelectedDate}
+        formattedSelectedDate={formattedSelectedDate}
+        reschedulingInfo={reschedulingInfo}
+        rescheduleTargetClassId={rescheduleTargetClassId}
+        rescheduleTargetDate={rescheduleTargetDate}
+        selectedRescheduleClassInfo={selectedRescheduleClassInfo}
+        getStudentAttendanceDetails={getStudentAttendanceDetails}
+        handleAttendanceChange={handleAttendanceChange}
+        handleRescheduleClick={handleRescheduleClick}
+        confirmReschedule={confirmReschedule}
+        setReschedulingInfo={setReschedulingInfo}
+        setRescheduleTargetClassId={setRescheduleTargetClassId}
+        setRescheduleTargetDate={setRescheduleTargetDate}
+        disableRescheduleDates={disableRescheduleDates}
+        handleRescheduleDateChange={handleRescheduleDateChange}
+      />
 
       {/* Style block (keep for now, might move styles later) */}
       <style jsx global>{`

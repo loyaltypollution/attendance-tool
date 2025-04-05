@@ -42,4 +42,21 @@ export interface ClassInstance {
       rescheduledToDate: string;
     };
   };
+}
+
+// Interface for students appearing in a class instance, noting if it's a makeup
+export interface DisplayStudent extends Student {
+  isMakeup: boolean;
+}
+
+// Interface for rescheduling information
+export interface ReschedulingInfo {
+  studentId: string;
+  studentName: string;
+  originalClassId: string;
+}
+
+// Interface for effective class instance with display students
+export interface EffectiveClassInstance extends ClassInfo {
+  displayStudents: DisplayStudent[];
 } 
